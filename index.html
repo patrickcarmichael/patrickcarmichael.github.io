@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+	<head>
+		<script type="text/javascript">
+			function startTime()
+			{
+				var today=new Date();
+				var h=today.getHours();
+				var m=today.getMinutes();
+				var s=today.getSeconds();
+				m=checkTime(m);
+				s=checkTime(s);
+				document.getElementById('txt').innerHTML=h%12+":"+m;
+				t=setTimeout('startTime()',500);
+			}
+			function checkTime(i)
+			{
+				if (i<10)
+				{
+					i="0" + i;
+				}
+				return i;
+			}
+		</script>
+		<title>Homepage</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css.css" />
+	</head>
+	<body onload="startTime()">
+  <div id="backgroundc">
+		<div id="container">
+			<div id="header">
+				<h3 style="display: inline;"><span class="red"> ~ </span> <span class="green">locate</span></h3>
+				<form method="get" action="https://www.google.com/search">
+					<input type="text" autofocus="autofocus" name="q" \>
+				</form>
+			</div>
+			<div id="links">
+
+				<div class="linksbox">
+					<h3><span class="red"> ~ [General]</span><span class="blue">:</span> ls</h3>
+			        <a class="cyan" target="blank" href="http://amazon.in">Amazon</a>
+			        <a class="pink"  target="blank" href="https://twitter.com">Twitter</a>
+					<a class="pink"  target="blank" href="https://gmail.com">Gmail</a>
+			        <a class="cyan" target="blank" href="https://youtube.com">Youtube</a>
+			        <a class="cyan" target="blank" href="https://github.com/">Github</a>
+				</div>
+
+				<div class="linksbox">
+					<h3><span class="red"> ~ [Reddit]</span><span class="blue">:</span> ls</h3>
+			        <a class="cyan" target="blank" href="https://www.reddit.com">Front Page</a>
+			        <a class="cyan" target="blank" href="https://www.reddit.com/r/india/">/r/india</a>
+			        <a class="cyan" target="blank" href="https://www.reddit.com/r/unixporn/">/r/unixporn</a>
+					<a class="cyan" target="blank" href="https://www.reddit.com/r/askreddit/">/r/askreddit</a>
+					<a class="cyan" target="blank" href="https://www.reddit.com/r/android/">/r/android</a>
+				</div>
+
+				<div class="linksbox">
+					<h3><span class="red"> ~ [University]</span><span class="blue">:</span> ls</h3>
+			        <a class="pink"  target="blank" href="https://erp.ncuindia.edu">ERP</a>
+					<a class="pink"  target="blank" href="https://lms.ncuindia.edu">LMS</a>
+					<a class="cyan" target="blank" href="https://203.115.107.68:8080/opac/html/SearchForm">Library</a>
+					<a class="cyan" target="blank" href="https://biometric.ncuindia.edu">Biometric</a>
+					<a class="cyan" target="blank" href="https://otms.local.ncuindia.edu">OTMS</a>
+				</div>
+
+			</div>
+			<div id="header">
+				<h3 style="display: inline"><span class="red"> ~ </span><span class="green"> echo " </span><span class="gray">Welcome Manik!, current time is </span> <span class="gray" id="txt"></span><span class="green"> "</span>
+			</div>
+		</div>
+	</div>
+	</body>
+</html>
