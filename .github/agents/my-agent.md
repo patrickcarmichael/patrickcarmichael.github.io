@@ -11,4 +11,4 @@ Describe what your agent does, when to use it, and its key capabilities.
 
 ## Example prompts
 
-- "Help me refactor the navigation logic in index.html."
+- "Help me refactor the authentication logic in my application."
