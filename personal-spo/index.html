@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Personal SPO — Attention Supply Path Optimizer</title>
+<style>
+  :root{
+    --bg:#f4efe6;
+    --panel:#fffaf2;
+    --ink:#211f1b;
+    --muted:#6f675d;
+    --line:#d8ccbc;
+    --accent:#7a4f3a;
+    --good:#2f6f55;
+    --warn:#9a681d;
+    --bad:#8a3f3f;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font:15px/1.45 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  .wrap{max-width:1400px;margin:0 auto;padding:28px}
+  header{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:24px;
+    align-items:end;
+    margin-bottom:24px;
+  }
+  h1{
+    font:700 clamp(34px,5vw,66px)/.95 Georgia,"Times New Roman",serif;
+    margin:0 0 12px;
+    letter-spacing:-.03em;
+  }
+  .kicker{letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  .lede{max-width:760px;color:var(--muted);font-size:17px;margin:0}
+  .thesis{
+    border-left:3px solid var(--accent);
+    padding:8px 0 8px 18px;
+    color:var(--muted);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:18px;
+  }
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+  .card .value{font:700 30px/1 Georgia,serif;margin-top:7px}
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:12px;margin-bottom:12px;
+  }
+  button{
+    appearance:none;border:1px solid var(--line);background:#fffdf8;color:var(--ink);
+    border-radius:999px;padding:9px 13px;font-weight:650;cursor:pointer;
+  }
+  button.primary{background:var(--ink);color:white;border-color:var(--ink)}
+  button:hover{transform:translateY(-1px)}
+  .tablewrap{overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+  table{width:100%;border-collapse:collapse;min-width:1180px}
+  th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle;text-align:left}
+  th{
+    position:sticky;top:0;background:#eee4d7;z-index:2;
+    color:#51493f;font-size:11px;text-transform:uppercase;letter-spacing:.09em;
+  }
+  tr:last-child td{border-bottom:0}
+  input[type=text],input[type=number]{
+    width:100%;background:#fffdf8;border:1px solid var(--line);border-radius:8px;
+    padding:8px;color:var(--ink);
+  }
+  input[type=range]{width:100%}
+  .score{font:700 20px Georgia,serif}
+  .badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:750}
+  .keep{background:#dcecdf;color:var(--good)}
+  .consolidate{background:#f1e3c6;color:var(--warn)}
+  .specialist{background:#ddd9ee;color:#574b86}
+  .sunset{background:#eed8d5;color:var(--bad)}
+  .delete{padding:7px 10px}
+  .foot{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+  .note{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .note h2{font:700 23px Georgia,serif;margin:0 0 8px}
+  .note p{margin:0;color:var(--muted)}
+  .small{font-size:12px;color:var(--muted)}
+  @media(max-width:900px){
+    header,.foot{grid-template-columns:1fr}
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .wrap{padding:18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="kicker">Personal Supply Path Optimization</div>
+      <h1>Attention is the inventory.</h1>
+      <p class="lede">
+        A pruning tool for agents, apps, memory systems, wearables, and everything else
+        politely insisting it deserves a permanent place in your cognitive supply chain.
+      </p>
+    </div>
+    <div class="thesis">
+      The question is not whether a tool is impressive. It is whether it delivers unique,
+      reliable value without quietly becoming another intermediary between you and your own life.
+    </div>
+  </header>
+
+  <section class="cards">
+    <div class="card"><div class="label">Active paths</div><div class="value" id="toolCount">0</div></div>
+    <div class="card"><div class="label">Monthly spend</div><div class="value" id="totalCost">$0</div></div>
+    <div class="card"><div class="label">Keep / specialist</div><div class="value" id="keepCount">0</div></div>
+    <div class="card"><div class="label">Potential savings</div><div class="value" id="savings">$0</div></div>
+  </section>
+
+  <div class="toolbar">
+    <button class="primary" id="addRow">Add tool</button>
+    <button id="save">Save locally</button>
+    <button id="export">Export CSV</button>
+    <button id="reset">Reset sample</button>
+    <span class="small">All data stays in this browser. A rare moment of restraint from software.</span>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:140px">Tool</th>
+          <th style="width:210px">Primary job</th>
+          <th>$/mo</th>
+          <th>Value<br><span class="small">1–5</span></th>
+          <th>Uniqueness<br><span class="small">1–5</span></th>
+          <th>Reliability<br><span class="small">1–5</span></th>
+          <th>Integration<br><span class="small">1–5</span></th>
+          <th>Portability<br><span class="small">1–5</span></th>
+          <th>Attention tax<br><span class="small">1–5</span></th>
+          <th>Score</th>
+          <th>Verdict</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <section class="foot">
+    <div class="note">
+      <h2>The rule</h2>
+      <p>
+        Keep tools that are both high-value and structurally distinct. Consolidate tools that
+        duplicate a route. Preserve odd specialists only when their uniqueness is real. Sunset
+        anything whose continued existence depends mainly on guilt, sunk cost, or a charming landing page.
+      </p>
+    </div>
+    <div class="note">
+      <h2>The metric that matters</h2>
+      <p>
+        Your personal “working media ratio” is the share of time and money that reaches an actual outcome,
+        rather than being consumed by setup, reconciliation, migration, checking, troubleshooting, and
+        deciding which agent should ask another agent to do something.
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>
+const sample = [
+  {tool:"Claude",job:"Primary thinking + coding",cost:100,value:5,unique:4,reliable:4,integration:4,portable:3,attention:2},
+  {tool:"ChatGPT",job:"General assistant + tools",cost:200,value:4,unique:4,reliable:4,integration:5,portable:3,attention:2},
+  {tool:"OpenClaw",job:"Local agent orchestration",cost:0,value:3,unique:4,reliable:2,integration:4,portable:4,attention:5},
+  {tool:"Hermes Agent",job:"Local autonomous workflows",cost:0,value:3,unique:3,reliable:2,integration:3,portable:4,attention:4},
+  {tool:"Granola",job:"Meeting memory",cost:0,value:4,unique:4,reliable:4,integration:3,portable:3,attention:1},
+  {tool:"Monologue",job:"Ambient transcription",cost:0,value:3,unique:4,reliable:3,integration:2,portable:3,attention:3},
+  {tool:"Bee",job:"Wearable capture",cost:0,value:3,unique:4,reliable:3,integration:2,portable:2,attention:3},
+  {tool:"Omi",job:"Lifelogging",cost:50,value:2,unique:3,reliable:2,integration:2,portable:2,attention:4},
+  {tool:"Basic Memory",job:"Local knowledge graph",cost:0,value:4,unique:4,reliable:4,integration:4,portable:5,attention:2},
+  {tool:"mem0",job:"Agent memory layer",cost:0,value:3,unique:3,reliable:3,integration:4,portable:3,attention:2}
+];
+
+let data = JSON.parse(localStorage.getItem("personalSPO") || "null") || structuredClone(sample);
+
+function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+function score(r){
+  const positive = (0.28*r.value + 0.22*r.unique + 0.20*r.reliable + 0.15*r.integration + 0.15*r.portable) / 5 * 100;
+  const attentionPenalty = (r.attention - 1) * 6;
+  const costPenalty = Math.min(15, (Number(r.cost)||0) / 20);
+  return Math.round(clamp(positive - attentionPenalty - costPenalty,0,100));
+}
+function verdict(r,s){
+  if(r.unique >= 4 && s < 60) return ["Specialist","specialist"];
+  if(s >= 75) return ["Keep","keep"];
+  if(s >= 58) return ["Consolidate","consolidate"];
+  return ["Sunset","sunset"];
+}
+function rowHTML(r,i){
+  const s=score(r), [v,c]=verdict(r,s);
+  const range = (key)=>`<input type="range" min="1" max="5" step="1" value="${r[key]}" data-i="${i}" data-k="${key}" title="${r[key]}">`;
+  return `<tr>
+    <td><input type="text" value="${escapeHtml(r.tool)}" data-i="${i}" data-k="tool"></td>
+    <td><input type="text" value="${escapeHtml(r.job)}" data-i="${i}" data-k="job"></td>
+    <td><input type="number" min="0" step="1" value="${r.cost}" data-i="${i}" data-k="cost"></td>
+    <td>${range("value")}</td>
+    <td>${range("unique")}</td>
+    <td>${range("reliable")}</td>
+    <td>${range("integration")}</td>
+    <td>${range("portable")}</td>
+    <td>${range("attention")}</td>
+    <td class="score">${s}</td>
+    <td><span class="badge ${c}">${v}</span></td>
+    <td><button class="delete" data-del="${i}">×</button></td>
+  </tr>`;
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+function render(){
+  document.getElementById("rows").innerHTML = data.map(rowHTML).join("");
+  const total = data.reduce((a,r)=>a+(Number(r.cost)||0),0);
+  const verdicts = data.map(r=>verdict(r,score(r))[0]);
+  const potential = data.reduce((a,r)=>{
+    const v=verdict(r,score(r))[0];
+    return a + ((v==="Sunset"||v==="Consolidate") ? (Number(r.cost)||0) : 0);
+  },0);
+  document.getElementById("toolCount").textContent=data.length;
+  document.getElementById("totalCost").textContent="$"+total.toLocaleString();
+  document.getElementById("keepCount").textContent=verdicts.filter(x=>x==="Keep"||x==="Specialist").length;
+  document.getElementById("savings").textContent="$"+potential.toLocaleString();
+  bind();
+}
+function bind(){
+  document.querySelectorAll("[data-k]").forEach(el=>{
+    el.addEventListener("input",e=>{
+      const i=+e.target.dataset.i, k=e.target.dataset.k;
+      data[i][k] = ["cost","value","unique","reliable","integration","portable","attention"].includes(k) ? Number(e.target.value) : e.target.value;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-del]").forEach(el=>{
+    el.addEventListener("click",e=>{ data.splice(+e.target.dataset.del,1); render(); });
+  });
+}
+document.getElementById("addRow").onclick=()=>{
+  data.push({tool:"New tool",job:"What is it actually for?",cost:0,value:3,unique:3,reliable:3,integration:3,portable:3,attention:3});
+  render();
+};
+document.getElementById("save").onclick=()=>{
+  localStorage.setItem("personalSPO",JSON.stringify(data));
+  const b=document.getElementById("save"), old=b.textContent;
+  b.textContent="Saved";
+  setTimeout(()=>b.textContent=old,900);
+};
+document.getElementById("reset").onclick=()=>{
+  data=structuredClone(sample); localStorage.removeItem("personalSPO"); render();
+};
+document.getElementById("export").onclick=()=>{
+  const headers=["Tool","Primary job","Monthly cost","Value","Uniqueness","Reliability","Integration","Portability","Attention tax","Score","Verdict"];
+  const lines=[headers.join(",")];
+  data.forEach(r=>{
+    const s=score(r), v=verdict(r,s)[0];
+    const vals=[r.tool,r.job,r.cost,r.value,r.unique,r.reliable,r.integration,r.portable,r.attention,s,v]
+      .map(x=>`"${String(x).replaceAll('"','""')}"`);
+    lines.push(vals.join(","));
+  });
+  const blob=new Blob([lines.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="personal-spo.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+render();
+</script>
+</body>
+</html>
