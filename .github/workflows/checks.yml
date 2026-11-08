@@ -1,0 +1,32 @@
+name: Checks
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Weekly passive run (Mondays 06:00 UTC) to catch rotted links.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  html-validate:
+    name: Validate HTML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate index.html
+        run: npx --yes html-validate index.html
+
+  link-check:
+    name: Check links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lychee link checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --accept 200,206,999 index.html README.md
+          fail: true
