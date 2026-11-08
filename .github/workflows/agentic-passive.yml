@@ -1,0 +1,92 @@
+name: Agentic Passive Ops
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run depth for passive checks"
+        required: true
+        type: choice
+        default: quick
+        options:
+          - quick
+          - full
+      include_link_scan:
+        description: "Also run external link scan"
+        required: false
+        type: boolean
+        default: false
+  pull_request:
+    branches: [master]
+    paths:
+      - "index.html"
+      - "README.md"
+      - ".github/workflows/**"
+  push:
+    branches: [master]
+    paths:
+      - "index.html"
+      - "README.md"
+      - ".github/workflows/**"
+  schedule:
+    - cron: "17 4 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agentic-passive-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  passive-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve execution mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.event.inputs.mode }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "value=full" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=quick" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate repository basics
+        run: |
+          test -f README.md
+          test -f index.html
+          test -f .github/workflows/pages.yml
+
+      - name: Quick static checks
+        run: |
+          grep -q "<!DOCTYPE html>" index.html
+          grep -q "<title>" index.html
+          grep -q "Deploy site" .github/workflows/pages.yml
+
+      - name: Full static checks
+        if: ${{ steps.mode.outputs.value == 'full' }}
+        run: |
+          grep -q 'meta name="viewport"' index.html
+          grep -q "<main>" index.html
+          grep -q "workflow_dispatch:" .github/workflows/pages.yml
+
+      - name: Link scan
+        if: ${{ steps.mode.outputs.value == 'full' || github.event.inputs.include_link_scan == 'true' }}
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --accept 200,403,429 README.md index.html
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Workflow summary
+        run: |
+          {
+            echo "## Agentic Passive Ops"
+            echo "- Trigger: \`${{ github.event_name }}\`"
+            echo "- Mode: \`${{ steps.mode.outputs.value }}\`"
+            echo "- Passive checks completed."
+          } >> "$GITHUB_STEP_SUMMARY"
